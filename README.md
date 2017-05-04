@@ -5,9 +5,7 @@
 
 <img src="images/banner.png">
 
-<img src="https://github.com/rjsvieira/FloatingMenu/blob/master/images/radial_open_close.gif" width="25%"><img src="https://github.com/rjsvieira/FloatingMenu/blob/master/images/radial_adapt.gif" width="25%">
-
-<img src="https://github.com/rjsvieira/FloatingMenu/blob/master/images/expand_open_close.gif" width="25%"><img src="https://github.com/rjsvieira/FloatingMenu/blob/master/images/expand_adapt.gif" width="25%">
+<img src="https://github.com/rjsvieira/FloatingMenu/blob/master/images/radial_open_close.gif" width="25%"><img src="https://github.com/rjsvieira/FloatingMenu/blob/master/images/radial_adapt.gif" width="25%"><img src="https://github.com/rjsvieira/FloatingMenu/blob/master/images/expand_open_close.gif" width="25%"><img src="https://github.com/rjsvieira/FloatingMenu/blob/master/images/expand_adapt.gif" width="25%">
 
 
 <h2>Include in your project</h2>
