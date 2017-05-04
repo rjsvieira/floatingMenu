@@ -1,6 +1,7 @@
 # FloatingMenuButton
 
 ![Current Version](https://img.shields.io/badge/Current%20Version-1.0.0-brightgreen.svg)
+[![](https://jitpack.io/v/rjsvieira/floatingMenu.svg)](https://jitpack.io/#rjsvieira/floatingMenu)
 ![Minimum SDK](https://img.shields.io/badge/minSdkVersion%20-15-blue.svg)
 
 <img src="images/banner.png">
