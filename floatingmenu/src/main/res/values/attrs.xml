@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<declare-styleable name="FloatingMenuButton">
+		<attr name="animationType" format="string"/>
+		<attr name="dispositionStartAngle" format="integer"/>
+		<attr name="dispositionEndAngle" format="integer"/>
+		<attr name="subActionButtonRadius" format="integer"/>
+	</declare-styleable>
+</resources>
