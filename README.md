@@ -43,7 +43,7 @@ The following XML file specifies the example on the radial gifs :
 <br>
 
 ```xml
-<rjsv.FloatingMenuButton.FloatingMenuButton.FloatingMenuButton
+<rjsv.floatingmenu.floatingmenubutton.FloatingMenuButton
   android:id="@+id/my_floating_button"
   android:layout_width="40dp"
   android:layout_height="40dp"
@@ -57,31 +57,31 @@ The following XML file specifies the example on the radial gifs :
   FloatingMenuButtonActionButton:dispositionStartAngle="0"
   FloatingMenuButtonActionButton:subActionButtonRadius="100">
 
-  <rjsv.FloatingMenuButton.FloatingMenuButton.subbutton.FloatingSubButton
+  <rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
     android:id="@+id/sub_button_1"
     android:layout_width="50dp"
     android:layout_height="50dp"
     android:background="@drawable/one"/>
 
-  <rjsv.FloatingMenuButton.FloatingMenuButton.subbutton.FloatingSubButton
+  <rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
     android:id="@+id/sub_button_2"
     android:layout_width="50dp"
     android:layout_height="50dp"
     android:background="@drawable/two"/>
 
-  <rjsv.FloatingMenuButton.FloatingMenuButton.subbutton.FloatingSubButton
+  <rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
     android:id="@+id/sub_button_3"
     android:layout_width="50dp"
     android:layout_height="50dp"
     android:background="@drawable/three"/>
 
-  <rjsv.FloatingMenuButton.FloatingMenuButton.subbutton.FloatingSubButton
+  <rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
     android:id="@+id/sub_button_4"
     android:layout_width="50dp"
     android:layout_height="50dp"
     android:background="@drawable/four"/>
 
-  <rjsv.FloatingMenuButton.FloatingMenuButton.subbutton.FloatingSubButton
+  <rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
     android:id="@+id/sub_button_5"
     android:layout_width="50dp"
     android:layout_height="50dp"
