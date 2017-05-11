@@ -21,3 +21,6 @@ floatingmenu/floatingmenu.iml
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+local.properties*
+gradle.properties*
