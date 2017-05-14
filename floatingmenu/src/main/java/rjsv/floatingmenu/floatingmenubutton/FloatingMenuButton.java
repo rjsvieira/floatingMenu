@@ -46,6 +46,7 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
     private int startAngle = 0, endAngle = 180;
     private int preservedStartAngle = 0, preservedEndAngle = 180;
     private int radius;
+    private boolean isAnchored = false;
     private boolean isMenuOpened = false;
     private Context context;
     private List<SubButton> subMenuButtons;
@@ -81,6 +82,7 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
             final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FloatingMenuButton, 0, 0);
             this.animationType = AnimationType.match(a.getString(R.styleable.FloatingMenuButton_animationType));
             this.radius = a.getInt(R.styleable.FloatingMenuButton_subActionButtonRadius, 100);
+            this.isAnchored = a.getBoolean(R.styleable.FloatingMenuButton_anchored, isAnchored);
             this.preservedStartAngle = a.getInt(R.styleable.FloatingMenuButton_dispositionStartAngle, startAngle);
             this.preservedEndAngle = a.getInt(R.styleable.FloatingMenuButton_dispositionEndAngle, endAngle);
             setDefaultImage(this);
@@ -128,20 +130,22 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
                     break;
 
                 case MotionEvent.ACTION_MOVE:
-                    final int pointerIndexMove = event.findPointerIndex(mActivePointerId);
-                    // get the old coordinates
-                    float oldPositionX = getX();
-                    float oldPositionY = getY();
-                    // calculate the new coordinates based on the finger's movement
-                    currentPositionX = oldPositionX + event.getX(pointerIndexMove) - aLastTouchX;
-                    currentPositionY = oldPositionY + event.getY(pointerIndexMove) - aLastTouchY;
-                    // check if the difference between old and new coordinates violates the boundaries
-                    boolean[] boundaries = isCentralViewOutsideBoundaries(oldPositionX, oldPositionY, currentPositionX, currentPositionY);
-                    currentPositionX = boundaries[0] ? 0 : (boundaries[2] ? (screenWidth - viewWidth) : currentPositionX);
-                    currentPositionY = boundaries[1] ? 0 : (boundaries[3] ? (screenHeight - viewHeight) : currentPositionY);
-                    // set the coordinates
-                    this.setX(currentPositionX);
-                    this.setY(currentPositionY);
+                    if (!isAnchored) {
+                        final int pointerIndexMove = event.findPointerIndex(mActivePointerId);
+                        // get the old coordinates
+                        float oldPositionX = getX();
+                        float oldPositionY = getY();
+                        // calculate the new coordinates based on the finger's movement
+                        currentPositionX = oldPositionX + event.getX(pointerIndexMove) - aLastTouchX;
+                        currentPositionY = oldPositionY + event.getY(pointerIndexMove) - aLastTouchY;
+                        // check if the difference between old and new coordinates violates the boundaries
+                        boolean[] boundaries = isCentralViewOutsideBoundaries(oldPositionX, oldPositionY, currentPositionX, currentPositionY);
+                        currentPositionX = boundaries[0] ? 0 : (boundaries[2] ? (screenWidth - viewWidth) : currentPositionX);
+                        currentPositionY = boundaries[1] ? 0 : (boundaries[3] ? (screenHeight - viewHeight) : currentPositionY);
+                        // set the coordinates
+                        this.setX(currentPositionX);
+                        this.setY(currentPositionY);
+                    }
                     break;
 
                 case MotionEvent.ACTION_CANCEL: {
@@ -461,6 +465,15 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
     public FloatingMenuButton setRadius(int radius) {
         this.radius = radius;
         return this;
+    }
+
+    public FloatingMenuButton setAnchored(boolean isAnchored) {
+        this.isAnchored = isAnchored;
+        return this;
+    }
+
+    public boolean isAnchored() {
+        return this.isAnchored;
     }
 
     public AnimationType getAnimationType() {
