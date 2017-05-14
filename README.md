@@ -48,46 +48,47 @@ The following XML file specifies the example on the radial gifs :
   android:layout_width="40dp"
   android:layout_height="40dp"
   android:scaleType="centerInside"
-  circleview:layout_constraintBottom_toBottomOf="parent"
-  circleview:layout_constraintLeft_toLeftOf="parent"
-  circleview:layout_constraintRight_toRightOf="parent"
-  circleview:layout_constraintTop_toTopOf="parent"
-  FloatingMenuButtonActionButton:animationType="radial"
-  FloatingMenuButtonActionButton:dispositionEndAngle="360"
-  FloatingMenuButtonActionButton:dispositionStartAngle="0"
-  FloatingMenuButtonActionButton:subActionButtonRadius="100">
+  app:layout_constraintBottom_toBottomOf="parent"
+  app:layout_constraintLeft_toLeftOf="parent"
+  app:layout_constraintRight_toRightOf="parent"
+  app:layout_constraintTop_toTopOf="parent"
+  floatingMenuActionButton:anchored="false"
+  floatingMenuActionButton:animationType="radial"
+  floatingMenuActionButton:dispositionEndAngle="360"
+  floatingMenuActionButton:dispositionStartAngle="0"
+  floatingMenuActionButton:subActionButtonRadius="100">
 
   <rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
     android:id="@+id/sub_button_1"
     android:layout_width="50dp"
     android:layout_height="50dp"
-    android:background="@drawable/one"/>
+    android:background="@drawable/one" />
 
   <rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
     android:id="@+id/sub_button_2"
     android:layout_width="50dp"
     android:layout_height="50dp"
-    android:background="@drawable/two"/>
+    android:background="@drawable/two" />
 
   <rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
     android:id="@+id/sub_button_3"
     android:layout_width="50dp"
     android:layout_height="50dp"
-    android:background="@drawable/three"/>
+    android:background="@drawable/three" />
 
   <rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
     android:id="@+id/sub_button_4"
     android:layout_width="50dp"
     android:layout_height="50dp"
-    android:background="@drawable/four"/>
+    android:background="@drawable/four" />
 
   <rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
     android:id="@+id/sub_button_5"
     android:layout_width="50dp"
     android:layout_height="50dp"
-    android:background="@drawable/five"/>
+    android:background="@drawable/five" />
 
-</rjsv.FloatingMenuButton.FloatingMenuButton.FloatingMenuButton>
+</rjsv.floatingmenu.floatingmenubutton.FloatingMenuButton>
  ```
 <h2>Attribute configuration list</h2>
 
@@ -96,6 +97,7 @@ The following XML file specifies the example on the radial gifs :
 | startAngle           | int | The starting angle for button disposition | 0 |
 | endAngle             | int | The ending angle for button disposition   | 180 |
 | radius               | int | The distance between the central button and its children | 100(dp) |
+| anchored             | boolean | Configures whether the user can or not drag the FloatingMenu around | false |
 | animationType        | AnimationType (Enumerator) | The open/close animation for FloatingMenuButton | AnimationType.EXPAND |
 | openingDuration      | int | The opening duration, in milliseconds, of the animation | 500 |
 | closingDuration      | int | The closing duration, in milliseconds, of the animation | 500 |
@@ -130,7 +132,8 @@ Consider the following example :
 floatingButton = (FloatingMenuButton) findViewById(R.id.my_floating_button);
 floatingButton.setStartAngle(0)
         .setEndAngle(360)
-        .setAnimationType(AnimationType.EXPAND);
+        .setAnimationType(AnimationType.EXPAND)
+        .setAnchored(false);
 floatingButton.getAnimationHandler()
         .setOpeningAnimationDuration(500)
         .setClosingAnimationDuration(200)
