@@ -1,0 +1,119 @@
+<android.support.constraint.ConstraintLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:floatingMenuActionButton="http://schemas.android.com/tools"
+	android:id="@+id/pai"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:layout_gravity="center_vertical"
+	android:background="#22222A">
+
+	<android.support.constraint.Guideline
+		android:id="@+id/gl_1"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		app:layout_constraintGuide_percent="0.5"/>
+
+	<android.support.constraint.Guideline
+		android:id="@+id/gl_2"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		app:layout_constraintGuide_percent="1.0"/>
+
+	<rjsv.floatingmenu.floatingmenubutton.FloatingMenuButton
+		android:id="@+id/fab_2"
+		android:layout_width="60dp"
+		android:layout_height="60dp"
+		android:scaleType="centerInside"
+		app:layout_constraintBottom_toTopOf="@+id/gl_2"
+		app:layout_constraintLeft_toLeftOf="parent"
+		app:layout_constraintRight_toRightOf="parent"
+		app:layout_constraintTop_toTopOf="@+id/gl_1"
+		floatingMenuActionButton:dispositionEndAngle="360"
+		floatingMenuActionButton:dispositionStartAngle="0"
+		floatingMenuActionButton:subActionButtonRadius="100">
+
+		<rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
+			android:id="@+id/fab_2_sub_fab_left_1"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
+			android:background="@drawable/one"/>
+
+		<rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
+			android:id="@+id/fab_2_sub_fab_left_2"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
+			android:background="@drawable/two"/>
+
+		<rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
+			android:id="@+id/fab_2_sub_fab_left_3"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
+			android:background="@drawable/three"/>
+
+		<rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
+			android:id="@+id/fab_2_sub_fab_left_4"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
+			android:background="@drawable/four"/>
+
+		<rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
+			android:id="@+id/fab_2_sub_fab_left_5"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
+			android:background="@drawable/five"/>
+
+	</rjsv.floatingmenu.floatingmenubutton.FloatingMenuButton>
+
+	<rjsv.floatingmenu.floatingmenubutton.FloatingMenuButton
+		android:id="@+id/fab_1"
+		android:layout_width="60dp"
+		android:layout_height="60dp"
+		android:layout_marginLeft="8dp"
+		android:layout_marginRight="8dp"
+		android:layout_marginTop="52dp"
+		android:scaleType="centerInside"
+		app:layout_constraintLeft_toLeftOf="parent"
+		app:layout_constraintRight_toRightOf="parent"
+		app:layout_constraintTop_toTopOf="parent"
+		floatingMenuActionButton:dispositionEndAngle="360"
+		floatingMenuActionButton:dispositionStartAngle="0"
+		floatingMenuActionButton:subActionButtonRadius="100"
+		android:layout_marginBottom="8dp"
+		app:layout_constraintBottom_toTopOf="@+id/gl_1">
+
+		<rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
+			android:id="@+id/fab_1_sub_fab_left_1"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
+			android:background="@drawable/one"/>
+
+		<rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
+			android:id="@+id/fab_1_sub_fab_left_2"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
+			android:background="@drawable/two"/>
+
+		<rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
+			android:id="@+id/fab_1_sub_fab_left_3"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
+			android:background="@drawable/three"/>
+
+		<rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
+			android:id="@+id/fab_1_sub_fab_left_4"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
+			android:background="@drawable/four"/>
+
+		<rjsv.floatingmenu.floatingmenubutton.subbutton.FloatingSubButton
+			android:id="@+id/fab_1_sub_fab_left_5"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
+			android:background="@drawable/five"/>
+
+	</rjsv.floatingmenu.floatingmenubutton.FloatingMenuButton>
+
+</android.support.constraint.ConstraintLayout>
