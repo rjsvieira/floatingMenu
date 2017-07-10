@@ -1,7 +1,7 @@
 # FloatingMenu
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FloatingMenu-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/5697)
-![Current Version](https://img.shields.io/badge/Current%20Version-1.1.0-brightgreen.svg)
+![Current Version](https://img.shields.io/badge/Current%20Version-1.2.0-brightgreen.svg)
 [![](https://jitpack.io/v/rjsvieira/floatingMenu.svg)](https://jitpack.io/#rjsvieira/floatingMenu)
 ![Minimum SDK](https://img.shields.io/badge/minSdkVersion%20-15-blue.svg)
 
@@ -27,7 +27,7 @@ allprojects {
 
 ```groovy
 dependencies {
-  compile 'com.github.rjsvieira:floatingMenu:1.1.0'
+  compile 'com.github.rjsvieira:floatingMenu:1.2.0'
 }
 ```
 
@@ -90,6 +90,26 @@ The following XML file specifies the example on the radial gifs :
 
 </rjsv.floatingmenu.floatingmenubutton.FloatingMenuButton>
  ```
+ 
+
+<h2> Adding a FloatingSubButton programmatically</h2>
+
+You can add a FloatingSubButton programmatically using the following lines of code. 
+
+```java
+FloatingSubButton floatingSubButton = new FloatingSubButton(this); // create the button
+floatingSubButton.setBackground(getDrawable(R.drawable.four)); // specify a custom background
+```
+And add it to the parent FloatingButton by either specifying layout parameters or assuming default parameters (as default, the layoutParameters for the first button on the list will be considered)
+```java
+floatingButton.addFloatingSubButton(floatingSubButton, customLayoutParameters); 
+```
+or 
+```java
+floatingButton.addFloatingSubButton(floatingSubButton); 
+```
+ 
+ 
 <h2>Attribute configuration list</h2>
 
 | Attribute        | Type           | Default  | Default |
@@ -121,7 +141,6 @@ public interface FloatingMenuButtonStateChangeListener {
 
 }
 ```
-
 
 <h2>FloatingMenuButton Animation Handler (Wrapper)</h2>
 
