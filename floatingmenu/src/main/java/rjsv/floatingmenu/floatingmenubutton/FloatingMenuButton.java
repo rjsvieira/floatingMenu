@@ -163,9 +163,10 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
     @Override
     public void addView(View child, ViewGroup.LayoutParams params) {
         if (child instanceof FloatingSubButton) {
-            if (params != null) {
-                child.setLayoutParams(params);
+            if (params == null) {
+                params = subMenuButtons.get(0).getView().getLayoutParams();
             }
+            child.setLayoutParams(params);
             SubButton button = new SubButton(child, 0, 0);
             setDefaultImage(button.getView());
             subMenuButtons.add(button);
@@ -254,6 +255,14 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
                 v.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.defaultimage));
             }
         }
+    }
+
+    public void addFloatingSubButton(FloatingSubButton floatingSubButton) {
+        addFloatingSubButton(floatingSubButton, null);
+    }
+
+    public void addFloatingSubButton(FloatingSubButton floatingSubButton, ViewGroup.LayoutParams layoutParams) {
+        addView(floatingSubButton, layoutParams);
     }
 
     private void addViewToCurrentContainer(View view) {
