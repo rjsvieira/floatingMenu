@@ -7,6 +7,7 @@ import android.support.v4.view.animation.FastOutSlowInInterpolator;
 
 import rjsv.floatingmenu.animation.enumerators.AnimationType;
 import rjsv.floatingmenu.floatingmenubutton.FloatingMenuButton;
+import rjsv.floatingmenu.floatingmenubutton.MovementStyle;
 
 public class MainActivity extends Activity {
 
@@ -20,12 +21,14 @@ public class MainActivity extends Activity {
         initUi();
     }
 
-    private void initUi(){
+    private void initUi() {
         fab_1 = (FloatingMenuButton) findViewById(R.id.fab_1);
         fab_1.setStartAngle(0)
                 .setEndAngle(360)
+                .setRadius(200)
                 .setAnimationType(AnimationType.EXPAND)
-                .setAnchored(false);
+                .setMovementStyle(MovementStyle.STICKED_TO_SIDES);
+
         fab_1.getAnimationHandler()
                 .setOpeningAnimationDuration(500)
                 .setClosingAnimationDuration(200)
@@ -34,14 +37,14 @@ public class MainActivity extends Activity {
                 .setClosingInterpolator(new FastOutLinearInInterpolator())
                 .shouldFade(true)
                 .shouldScale(true)
-                .shouldRotate(false)
-        ;
+                .shouldRotate(false);
 
         fab_2 = (FloatingMenuButton) findViewById(R.id.fab_2);
         fab_2.setStartAngle(0)
                 .setEndAngle(360)
                 .setAnimationType(AnimationType.RADIAL)
-                .setAnchored(false);
+                .setMovementStyle(MovementStyle.ANCHORED);
+
         fab_2.getAnimationHandler()
                 .setOpeningAnimationDuration(500)
                 .setClosingAnimationDuration(200)
@@ -50,8 +53,7 @@ public class MainActivity extends Activity {
                 .setClosingInterpolator(new FastOutLinearInInterpolator())
                 .shouldFade(true)
                 .shouldScale(true)
-                .shouldRotate(false)
-        ;
+                .shouldRotate(false);
 
     }
 }

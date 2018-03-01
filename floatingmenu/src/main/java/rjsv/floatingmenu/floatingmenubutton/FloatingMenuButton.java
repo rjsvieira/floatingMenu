@@ -46,7 +46,7 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
     private int startAngle = 0, endAngle = 180;
     private int preservedStartAngle = 0, preservedEndAngle = 180;
     private int radius;
-    private boolean isAnchored = false;
+    private MovementStyle movementStyle = MovementStyle.FREE;
     private boolean isMenuOpened = false;
     private Context context;
     private List<SubButton> subMenuButtons;
@@ -82,7 +82,7 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
             final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FloatingMenuButton, 0, 0);
             this.animationType = AnimationType.match(a.getString(R.styleable.FloatingMenuButton_animationType));
             this.radius = a.getInt(R.styleable.FloatingMenuButton_subActionButtonRadius, 100);
-            this.isAnchored = a.getBoolean(R.styleable.FloatingMenuButton_anchored, isAnchored);
+            this.movementStyle = a.getBoolean(R.styleable.FloatingMenuButton_anchored, false) ? MovementStyle.ANCHORED : MovementStyle.FREE;
             this.preservedStartAngle = a.getInt(R.styleable.FloatingMenuButton_dispositionStartAngle, startAngle);
             this.preservedEndAngle = a.getInt(R.styleable.FloatingMenuButton_dispositionEndAngle, endAngle);
             setDefaultImage(this);
@@ -130,7 +130,7 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
                     break;
 
                 case MotionEvent.ACTION_MOVE:
-                    if (!isAnchored) {
+                    if (movementStyle != MovementStyle.ANCHORED) {
                         final int pointerIndexMove = event.findPointerIndex(mActivePointerId);
                         // get the old coordinates
                         float oldPositionX = getX();
@@ -142,9 +142,30 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
                         boolean[] boundaries = isCentralViewOutsideBoundaries(oldPositionX, oldPositionY, currentPositionX, currentPositionY);
                         currentPositionX = boundaries[0] ? 0 : (boundaries[2] ? (screenWidth - viewWidth) : currentPositionX);
                         currentPositionY = boundaries[1] ? 0 : (boundaries[3] ? (screenHeight - viewHeight) : currentPositionY);
-                        // set the coordinates
+
+                        if (movementStyle == MovementStyle.STICKED_TO_SIDES) {
+                            boolean[] viewOutsideBoundaries = isGlobalViewOutsideBoundaries();
+                            boolean left = viewOutsideBoundaries[0];
+                            boolean top = viewOutsideBoundaries[1];
+                            boolean right = viewOutsideBoundaries[2];
+                            boolean bottom = viewOutsideBoundaries[3];
+
+//                            if ((!top || oldPositionY < currentPositionY - 5) && (!bottom || oldPositionY > currentPositionY + 5)) {
+                            if (top) {
+                                if (currentPositionY > oldPositionY)
+                                    this.setY(currentPositionY);
+                            } else if (bottom) {
+                                if (currentPositionY < oldPositionY)
+                                    this.setY(currentPositionY);
+                            } else {
+                                this.setY(currentPositionY);
+                            }
+                        } else {
+                            // set the coordinates
+                            this.setY(currentPositionY);
+                        }
+
                         this.setX(currentPositionX);
-                        this.setY(currentPositionY);
                     }
                     break;
 
@@ -476,13 +497,29 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
         return this;
     }
 
+    /**
+     * @deprecated Use movementStyle instead
+     */
+    @Deprecated
     public FloatingMenuButton setAnchored(boolean isAnchored) {
-        this.isAnchored = isAnchored;
+        movementStyle = isAnchored?MovementStyle.ANCHORED: MovementStyle.FREE;
         return this;
     }
 
+    /**
+     * @deprecated Use movementStyle instead
+     */
+    @Deprecated
     public boolean isAnchored() {
-        return this.isAnchored;
+        return movementStyle == MovementStyle.ANCHORED;
+    }
+
+    public void setMovementStyle(MovementStyle movementStyle) {
+        this.movementStyle = movementStyle;
+    }
+
+    public MovementStyle getMovementStyle() {
+        return movementStyle;
     }
 
     public AnimationType getAnimationType() {
