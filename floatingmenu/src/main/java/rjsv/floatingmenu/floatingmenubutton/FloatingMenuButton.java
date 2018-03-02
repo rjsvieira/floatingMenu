@@ -75,13 +75,29 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
         public void run() {
             Animation fadeOut = new AlphaAnimation(1, 0.6f);
             fadeOut.setInterpolator(new AccelerateInterpolator()); //and this
-            fadeOut.setStartOffset(1000);
             fadeOut.setDuration(300);
+            fadeOut.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    floatingMenuButton.setAlpha(0.6f);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
 
             AnimationSet animation = new AnimationSet(false); //change to false
             animation.addAnimation(fadeOut);
-            floatingMenuButton.setAnimation(animation);
-            floatingMenuButton.setAlpha(0.6f);
+            if (!floatingMenuButton.isMenuOpen())
+                floatingMenuButton.startAnimation(animation);
         }
     };
 
