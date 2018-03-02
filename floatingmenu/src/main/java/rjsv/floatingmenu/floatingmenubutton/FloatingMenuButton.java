@@ -67,8 +67,23 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
     private float screenWidth, screenHeight;
     private float viewWidth, viewHeight;
     private int mActivePointerId = INVALID_POINTER_ID;
-    private Handler handler;
+    private Handler transparancyHandler;
+    private FloatingMenuButton floatingMenuButton;
 
+    private Runnable transparencyRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Animation fadeOut = new AlphaAnimation(1, 0.6f);
+            fadeOut.setInterpolator(new AccelerateInterpolator()); //and this
+            fadeOut.setStartOffset(1000);
+            fadeOut.setDuration(300);
+
+            AnimationSet animation = new AnimationSet(false); //change to false
+            animation.addAnimation(fadeOut);
+            floatingMenuButton.setAnimation(animation);
+            floatingMenuButton.setAlpha(0.6f);
+        }
+    };
 
     // Constructors
     public FloatingMenuButton(Context context) {
@@ -85,7 +100,7 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
         subMenuButtons = new ArrayList<>();
         menuAnimationHandler = new FloatingMenuAnimationHandler(this);
         floatingMenuActionButtonClickListener = new FloatingMenuButtonClickListener();
-        handler = new Handler();
+        transparancyHandler = new Handler();
 
         beginGoTransparentProcess(this);
 
@@ -226,27 +241,17 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
     }
 
     private void beginGoTransparentProcess(final FloatingMenuButton button) {
-        if (transparentAfterMilliseconds >= 0) {
-            handler.removeCallbacks(null);
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Animation fadeOut = new AlphaAnimation(1, 0.6f);
-                    fadeOut.setInterpolator(new AccelerateInterpolator()); //and this
-                    fadeOut.setStartOffset(1000);
-                    fadeOut.setDuration(300);
+        transparancyHandler.removeCallbacks(transparencyRunnable);
+        floatingMenuButton = button;
 
-                    AnimationSet animation = new AnimationSet(false); //change to false
-                    animation.addAnimation(fadeOut);
-                    button.setAnimation(animation);
-                    button.setAlpha(0.6f);
-                }
-            }, transparentAfterMilliseconds);
+        if (transparentAfterMilliseconds >= 0) {
+            transparancyHandler.postDelayed(transparencyRunnable, transparentAfterMilliseconds);
         }
     }
 
     private void restoreTransparency(FloatingMenuButton button) {
         button.setAlpha(1);
+        transparancyHandler.removeCallbacks(transparencyRunnable);
     }
 
     @Override
@@ -285,6 +290,8 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
     }
 
     public void openMenu() {
+        transparancyHandler.removeCallbacks(transparencyRunnable);
+
         if (menuAnimationHandler != null && !menuAnimationHandler.isAnimating()) {
             Pair<Integer, Integer> angles = calculateDispositionAngles();
             Point center = calculateItemPositions(angles.first, angles.second);
