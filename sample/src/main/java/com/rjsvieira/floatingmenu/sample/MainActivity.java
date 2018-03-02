@@ -42,6 +42,7 @@ public class MainActivity extends Activity {
         fab_2 = (FloatingMenuButton) findViewById(R.id.fab_2);
         fab_2.setStartAngle(0)
                 .setEndAngle(360)
+                .setTransparentAfterMilliseconds(0)
                 .setAnimationType(AnimationType.RADIAL)
                 .setMovementStyle(MovementStyle.FREE);
 

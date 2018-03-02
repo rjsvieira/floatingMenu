@@ -7,6 +7,7 @@ import android.graphics.PathMeasure;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Pair;
@@ -14,6 +15,10 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
@@ -46,6 +51,7 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
     private int startAngle = 0, endAngle = 180;
     private int preservedStartAngle = 0, preservedEndAngle = 180;
     private int radius;
+    private int transparentAfterMilliseconds = 2000;
     private MovementStyle movementStyle = MovementStyle.FREE;
     private boolean isMenuOpened = false;
     private Context context;
@@ -61,6 +67,7 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
     private float screenWidth, screenHeight;
     private float viewWidth, viewHeight;
     private int mActivePointerId = INVALID_POINTER_ID;
+    private Handler handler;
 
 
     // Constructors
@@ -78,6 +85,10 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
         subMenuButtons = new ArrayList<>();
         menuAnimationHandler = new FloatingMenuAnimationHandler(this);
         floatingMenuActionButtonClickListener = new FloatingMenuButtonClickListener();
+        handler = new Handler();
+
+        beginGoTransparentProcess(this);
+
         if (attrs != null) {
             final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FloatingMenuButton, 0, 0);
             this.animationType = AnimationType.match(a.getString(R.styleable.FloatingMenuButton_animationType));
@@ -107,6 +118,9 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
     @Override
     public boolean onTouch(View view, MotionEvent event) {
         try {
+            // Return the alpha to normal
+            restoreTransparency(this);
+
             switch (event.getAction() & MotionEvent.ACTION_MASK) {
                 case MotionEvent.ACTION_DOWN:
                     mActivePointerId = event.getPointerId(0);
@@ -119,9 +133,14 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
                     break;
 
                 case MotionEvent.ACTION_UP:
+
                     if (Utils.isAClick(clickThreshold, startPositionX, getX(), startPositionY, getY())) {
+                        // If the state is Open, the it will close after this click
+                        if (isMenuOpen()) beginGoTransparentProcess(this);
                         floatingMenuActionButtonClickListener.onClick(FloatingMenuButton.this);
                     } else {
+                        if (!isMenuOpen()) beginGoTransparentProcess(this);
+
                         if (movementStyle == MovementStyle.STICKED_TO_SIDES) {
                             int padding = 10;
 
@@ -131,7 +150,7 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
 
                             if (top) {
                                 currentPositionY = radius; // top
-                            } else if (bottom){
+                            } else if (bottom) {
                                 currentPositionY = screenHeight - (radius + viewHeight);
                             }
 
@@ -204,6 +223,30 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
         }
         invalidate();
         return true;
+    }
+
+    private void beginGoTransparentProcess(final FloatingMenuButton button) {
+        if (transparentAfterMilliseconds >= 0) {
+            handler.removeCallbacks(null);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Animation fadeOut = new AlphaAnimation(1, 0.6f);
+                    fadeOut.setInterpolator(new AccelerateInterpolator()); //and this
+                    fadeOut.setStartOffset(1000);
+                    fadeOut.setDuration(300);
+
+                    AnimationSet animation = new AnimationSet(false); //change to false
+                    animation.addAnimation(fadeOut);
+                    button.setAnimation(animation);
+                    button.setAlpha(0.6f);
+                }
+            }, transparentAfterMilliseconds);
+        }
+    }
+
+    private void restoreTransparency(FloatingMenuButton button) {
+        button.setAlpha(1);
     }
 
     @Override
@@ -553,8 +596,9 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
         return movementStyle == MovementStyle.ANCHORED;
     }
 
-    public void setMovementStyle(MovementStyle movementStyle) {
+    public FloatingMenuButton setMovementStyle(MovementStyle movementStyle) {
         this.movementStyle = movementStyle;
+        return this;
     }
 
     public MovementStyle getMovementStyle() {
@@ -580,4 +624,18 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
         return subMenuButtons;
     }
 
+    /**
+     * Indicates after how many milliseconds the button should get transparent
+     * after it was moved or clicked.
+     *
+     * @param transparentAfterMilliseconds the time in milliseconds, 0 to always be transparent or < 0 to never be transparent.
+     */
+    public FloatingMenuButton setTransparentAfterMilliseconds(int transparentAfterMilliseconds) {
+        this.transparentAfterMilliseconds = transparentAfterMilliseconds;
+        return this;
+    }
+
+    public int getTransparentAfterMilliseconds() {
+        return transparentAfterMilliseconds;
+    }
 }
