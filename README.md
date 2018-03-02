@@ -116,7 +116,7 @@ floatingButton.addFloatingSubButton(floatingSubButton);
 | startAngle           | int | The starting angle for button disposition | 0 |
 | endAngle             | int | The ending angle for button disposition   | 180 |
 | radius               | int | The distance between the central button and its children | 100(dp) |
-| movementStyle        | MovementStyle | Configures whether the user can or not drag the FloatingMenu around | MovementStyle.FREE |
+| movementStyle        | MovementStyle (Enumerator) | Configures whether the user can or not drag the FloatingMenu around | MovementStyle.FREE |
 | animationType        | AnimationType (Enumerator) | The open/close animation for FloatingMenuButton | AnimationType.EXPAND |
 | openingDuration      | int | The opening duration, in milliseconds, of the animation | 500 |
 | closingDuration      | int | The closing duration, in milliseconds, of the animation | 500 |
