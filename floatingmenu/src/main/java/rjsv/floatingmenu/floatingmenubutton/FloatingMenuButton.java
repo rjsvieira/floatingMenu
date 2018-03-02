@@ -121,11 +121,37 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
                 case MotionEvent.ACTION_UP:
                     if (Utils.isAClick(clickThreshold, startPositionX, getX(), startPositionY, getY())) {
                         floatingMenuActionButtonClickListener.onClick(FloatingMenuButton.this);
-                    } else if (isMenuOpened) {
-                        Point p = new Point();
-                        p.x += (viewWidth / 2) + currentPositionX;
-                        p.y += (viewHeight / 2) + currentPositionY;
-                        reOpenMenu(p);
+                    } else {
+                        if (movementStyle == MovementStyle.STICKED_TO_SIDES) {
+                            int padding = 10;
+
+                            boolean[] boundaries = isGlobalViewOutsideBoundaries(padding);
+                            boolean top = boundaries[1];
+                            boolean bottom = boundaries[3];
+
+                            if (top) {
+                                currentPositionY = radius; // top
+                            } else if (bottom){
+                                currentPositionY = screenHeight - (radius + viewHeight);
+                            }
+
+                            // Force the button to stick either to right or left of the screen
+                            if (currentPositionX >= screenWidth / 2) {
+                                currentPositionX = screenWidth - viewWidth;
+                            } else {
+                                currentPositionX = 0;
+                            }
+
+                            // set the coordinates
+                            this.setY(currentPositionY);
+                            this.setX(currentPositionX);
+                        }
+                        if (isMenuOpened) {
+                            Point p = new Point();
+                            p.x += (viewWidth / 2) + currentPositionX;
+                            p.y += (viewHeight / 2) + currentPositionY;
+                            reOpenMenu(p);
+                        }
                     }
                     break;
 
@@ -144,19 +170,18 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
                         currentPositionY = boundaries[1] ? 0 : (boundaries[3] ? (screenHeight - viewHeight) : currentPositionY);
 
                         if (movementStyle == MovementStyle.STICKED_TO_SIDES) {
-                            boolean[] viewOutsideBoundaries = isGlobalViewOutsideBoundaries();
-                            boolean left = viewOutsideBoundaries[0];
+                            boolean[] viewOutsideBoundaries = isGlobalViewOutsideBoundaries(10);
                             boolean top = viewOutsideBoundaries[1];
-                            boolean right = viewOutsideBoundaries[2];
                             boolean bottom = viewOutsideBoundaries[3];
 
-//                            if ((!top || oldPositionY < currentPositionY - 5) && (!bottom || oldPositionY > currentPositionY + 5)) {
                             if (top) {
-                                if (currentPositionY > oldPositionY)
+                                if (currentPositionY > oldPositionY) {
                                     this.setY(currentPositionY);
+                                }
                             } else if (bottom) {
-                                if (currentPositionY < oldPositionY)
+                                if (currentPositionY < oldPositionY) {
                                     this.setY(currentPositionY);
+                                }
                             } else {
                                 this.setY(currentPositionY);
                             }
@@ -382,7 +407,28 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
      * Returns a boolean array (left, top, right, bottom) that indicates whether the opened menu view touches its sides
      */
     private boolean[] isGlobalViewOutsideBoundaries() {
+        return isGlobalViewOutsideBoundaries(0);
+    }
+
+    /**
+     * Returns a boolean array (left, top, right, bottom) that indicates whether the opened menu view touches its sides
+     *
+     * @param padding An extra space added to the calculus of the radius
+     */
+    private boolean[] isGlobalViewOutsideBoundaries(int padding) {
         boolean[] results = new boolean[4];
+        float realRadius = getRealRadius(padding);
+
+        // get the center
+        Point center = getActionViewCenter();
+        results[0] = center.x - realRadius <= 0; // left
+        results[2] = center.x + realRadius >= screenWidth; // right
+        results[1] = center.y - realRadius <= 0; // top
+        results[3] = center.y + realRadius >= screenHeight; // bottom
+        return results;
+    }
+
+    private float getRealRadius(int padding) {
         // 1 - get the largest width/height of the children
         int largestWidth = 0, largestHeight = 0;
         for (SubButton button : subMenuButtons) {
@@ -394,14 +440,7 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
             }
         }
         // 2 - add radius to the width to calculate the wides
-        float realRadius = radius + (largestWidth >= largestHeight ? largestWidth : largestHeight) / 2;
-        // 3 - get the center
-        Point center = getActionViewCenter();
-        results[0] = center.x - realRadius <= 0; // left
-        results[2] = center.x + realRadius >= screenWidth; // right
-        results[1] = center.y - realRadius <= 0; // top
-        results[3] = center.y + realRadius >= screenHeight; // bottom
-        return results;
+        return radius + padding + (largestWidth >= largestHeight ? largestWidth : largestHeight) / 2;
     }
 
     private Pair<Integer, Integer> calculateDispositionAngles() {
@@ -502,7 +541,7 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
      */
     @Deprecated
     public FloatingMenuButton setAnchored(boolean isAnchored) {
-        movementStyle = isAnchored?MovementStyle.ANCHORED: MovementStyle.FREE;
+        movementStyle = isAnchored ? MovementStyle.ANCHORED : MovementStyle.FREE;
         return this;
     }
 

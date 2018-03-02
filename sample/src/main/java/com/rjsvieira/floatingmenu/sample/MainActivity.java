@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
         fab_2.setStartAngle(0)
                 .setEndAngle(360)
                 .setAnimationType(AnimationType.RADIAL)
-                .setMovementStyle(MovementStyle.ANCHORED);
+                .setMovementStyle(MovementStyle.FREE);
 
         fab_2.getAnimationHandler()
                 .setOpeningAnimationDuration(500)
