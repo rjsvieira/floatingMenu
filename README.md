@@ -1,7 +1,7 @@
 # FloatingMenu
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FloatingMenu-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/5697)
-![Current Version](https://img.shields.io/badge/Current%20Version-1.2.0-brightgreen.svg)
+![Current Version](https://img.shields.io/badge/Current%20Version-1.3.0-brightgreen.svg)
 [![](https://jitpack.io/v/rjsvieira/floatingMenu.svg)](https://jitpack.io/#rjsvieira/floatingMenu)
 ![Minimum SDK](https://img.shields.io/badge/minSdkVersion%20-15-blue.svg)
 
@@ -27,7 +27,7 @@ allprojects {
 
 ```groovy
 dependencies {
-  compile 'com.github.rjsvieira:floatingMenu:1.2.0'
+  compile 'com.github.rjsvieira:floatingMenu:1.3.0'
 }
 ```
 
