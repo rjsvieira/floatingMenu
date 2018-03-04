@@ -52,7 +52,6 @@ The following XML file specifies the example on the radial gifs :
   app:layout_constraintLeft_toLeftOf="parent"
   app:layout_constraintRight_toRightOf="parent"
   app:layout_constraintTop_toTopOf="parent"
-  floatingMenuActionButton:anchored="false"
   floatingMenuActionButton:animationType="radial"
   floatingMenuActionButton:dispositionEndAngle="360"
   floatingMenuActionButton:dispositionStartAngle="0"
@@ -117,7 +116,7 @@ floatingButton.addFloatingSubButton(floatingSubButton);
 | startAngle           | int | The starting angle for button disposition | 0 |
 | endAngle             | int | The ending angle for button disposition   | 180 |
 | radius               | int | The distance between the central button and its children | 100(dp) |
-| anchored             | boolean | Configures whether the user can or not drag the FloatingMenu around | false |
+| movementStyle        | MovementStyle (Enumerator) | Configures whether the user can or not drag the FloatingMenu around | MovementStyle.FREE |
 | animationType        | AnimationType (Enumerator) | The open/close animation for FloatingMenuButton | AnimationType.EXPAND |
 | openingDuration      | int | The opening duration, in milliseconds, of the animation | 500 |
 | closingDuration      | int | The closing duration, in milliseconds, of the animation | 500 |
@@ -152,7 +151,7 @@ floatingButton = (FloatingMenuButton) findViewById(R.id.my_floating_button);
 floatingButton.setStartAngle(0)
         .setEndAngle(360)
         .setAnimationType(AnimationType.EXPAND)
-        .setAnchored(false);
+        .setMovementStyle(MovementStyle.STICKED_TO_SIDES);
 floatingButton.getAnimationHandler()
         .setOpeningAnimationDuration(500)
         .setClosingAnimationDuration(200)
@@ -161,6 +160,5 @@ floatingButton.getAnimationHandler()
         .setClosingInterpolator(new FastOutLinearInInterpolator())
         .shouldFade(true)
         .shouldScale(true)
-        .shouldRotate(false)
-;
+        .shouldRotate(false);
 ```

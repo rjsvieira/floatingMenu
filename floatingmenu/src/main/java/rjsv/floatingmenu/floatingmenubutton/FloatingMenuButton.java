@@ -7,6 +7,7 @@ import android.graphics.PathMeasure;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Pair;
@@ -14,6 +15,10 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
@@ -46,7 +51,8 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
     private int startAngle = 0, endAngle = 180;
     private int preservedStartAngle = 0, preservedEndAngle = 180;
     private int radius;
-    private boolean isAnchored = false;
+    private int transparentAfterMilliseconds = 2000;
+    private MovementStyle movementStyle = MovementStyle.FREE;
     private boolean isMenuOpened = false;
     private Context context;
     private List<SubButton> subMenuButtons;
@@ -61,7 +67,39 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
     private float screenWidth, screenHeight;
     private float viewWidth, viewHeight;
     private int mActivePointerId = INVALID_POINTER_ID;
+    private Handler transparancyHandler;
+    private FloatingMenuButton floatingMenuButton;
 
+    private Runnable transparencyRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Animation fadeOut = new AlphaAnimation(1, 0.6f);
+            fadeOut.setInterpolator(new AccelerateInterpolator()); //and this
+            fadeOut.setDuration(300);
+            fadeOut.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    floatingMenuButton.setAlpha(0.6f);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+
+            AnimationSet animation = new AnimationSet(false); //change to false
+            animation.addAnimation(fadeOut);
+            if (!floatingMenuButton.isMenuOpen())
+                floatingMenuButton.startAnimation(animation);
+        }
+    };
 
     // Constructors
     public FloatingMenuButton(Context context) {
@@ -78,11 +116,15 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
         subMenuButtons = new ArrayList<>();
         menuAnimationHandler = new FloatingMenuAnimationHandler(this);
         floatingMenuActionButtonClickListener = new FloatingMenuButtonClickListener();
+        transparancyHandler = new Handler();
+
+        beginGoTransparentProcess(this);
+
         if (attrs != null) {
             final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FloatingMenuButton, 0, 0);
             this.animationType = AnimationType.match(a.getString(R.styleable.FloatingMenuButton_animationType));
             this.radius = a.getInt(R.styleable.FloatingMenuButton_subActionButtonRadius, 100);
-            this.isAnchored = a.getBoolean(R.styleable.FloatingMenuButton_anchored, isAnchored);
+            this.movementStyle = a.getBoolean(R.styleable.FloatingMenuButton_anchored, false) ? MovementStyle.ANCHORED : MovementStyle.FREE;
             this.preservedStartAngle = a.getInt(R.styleable.FloatingMenuButton_dispositionStartAngle, startAngle);
             this.preservedEndAngle = a.getInt(R.styleable.FloatingMenuButton_dispositionEndAngle, endAngle);
             setDefaultImage(this);
@@ -107,6 +149,9 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
     @Override
     public boolean onTouch(View view, MotionEvent event) {
         try {
+            // Return the alpha to normal
+            restoreTransparency(this);
+
             switch (event.getAction() & MotionEvent.ACTION_MASK) {
                 case MotionEvent.ACTION_DOWN:
                     mActivePointerId = event.getPointerId(0);
@@ -119,18 +164,49 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
                     break;
 
                 case MotionEvent.ACTION_UP:
+
                     if (Utils.isAClick(clickThreshold, startPositionX, getX(), startPositionY, getY())) {
+                        // If the state is Open, the it will close after this click
+                        if (isMenuOpen()) beginGoTransparentProcess(this);
                         floatingMenuActionButtonClickListener.onClick(FloatingMenuButton.this);
-                    } else if (isMenuOpened) {
-                        Point p = new Point();
-                        p.x += (viewWidth / 2) + currentPositionX;
-                        p.y += (viewHeight / 2) + currentPositionY;
-                        reOpenMenu(p);
+                    } else {
+                        if (!isMenuOpen()) beginGoTransparentProcess(this);
+
+                        if (movementStyle == MovementStyle.STICKED_TO_SIDES) {
+                            int padding = 10;
+
+                            boolean[] boundaries = isGlobalViewOutsideBoundaries(padding);
+                            boolean top = boundaries[1];
+                            boolean bottom = boundaries[3];
+
+                            if (top) {
+                                currentPositionY = radius; // top
+                            } else if (bottom) {
+                                currentPositionY = screenHeight - (radius + viewHeight);
+                            }
+
+                            // Force the button to stick either to right or left of the screen
+                            if (currentPositionX >= screenWidth / 2) {
+                                currentPositionX = screenWidth - viewWidth;
+                            } else {
+                                currentPositionX = 0;
+                            }
+
+                            // set the coordinates
+                            this.setY(currentPositionY);
+                            this.setX(currentPositionX);
+                        }
+                        if (isMenuOpened) {
+                            Point p = new Point();
+                            p.x += (viewWidth / 2) + currentPositionX;
+                            p.y += (viewHeight / 2) + currentPositionY;
+                            reOpenMenu(p);
+                        }
                     }
                     break;
 
                 case MotionEvent.ACTION_MOVE:
-                    if (!isAnchored) {
+                    if (movementStyle != MovementStyle.ANCHORED) {
                         final int pointerIndexMove = event.findPointerIndex(mActivePointerId);
                         // get the old coordinates
                         float oldPositionX = getX();
@@ -142,9 +218,29 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
                         boolean[] boundaries = isCentralViewOutsideBoundaries(oldPositionX, oldPositionY, currentPositionX, currentPositionY);
                         currentPositionX = boundaries[0] ? 0 : (boundaries[2] ? (screenWidth - viewWidth) : currentPositionX);
                         currentPositionY = boundaries[1] ? 0 : (boundaries[3] ? (screenHeight - viewHeight) : currentPositionY);
-                        // set the coordinates
+
+                        if (movementStyle == MovementStyle.STICKED_TO_SIDES) {
+                            boolean[] viewOutsideBoundaries = isGlobalViewOutsideBoundaries(10);
+                            boolean top = viewOutsideBoundaries[1];
+                            boolean bottom = viewOutsideBoundaries[3];
+
+                            if (top) {
+                                if (currentPositionY > oldPositionY) {
+                                    this.setY(currentPositionY);
+                                }
+                            } else if (bottom) {
+                                if (currentPositionY < oldPositionY) {
+                                    this.setY(currentPositionY);
+                                }
+                            } else {
+                                this.setY(currentPositionY);
+                            }
+                        } else {
+                            // set the coordinates
+                            this.setY(currentPositionY);
+                        }
+
                         this.setX(currentPositionX);
-                        this.setY(currentPositionY);
                     }
                     break;
 
@@ -158,6 +254,20 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
         }
         invalidate();
         return true;
+    }
+
+    private void beginGoTransparentProcess(final FloatingMenuButton button) {
+        transparancyHandler.removeCallbacks(transparencyRunnable);
+        floatingMenuButton = button;
+
+        if (transparentAfterMilliseconds >= 0) {
+            transparancyHandler.postDelayed(transparencyRunnable, transparentAfterMilliseconds);
+        }
+    }
+
+    private void restoreTransparency(FloatingMenuButton button) {
+        button.setAlpha(1);
+        transparancyHandler.removeCallbacks(transparencyRunnable);
     }
 
     @Override
@@ -196,6 +306,8 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
     }
 
     public void openMenu() {
+        transparancyHandler.removeCallbacks(transparencyRunnable);
+
         if (menuAnimationHandler != null && !menuAnimationHandler.isAnimating()) {
             Pair<Integer, Integer> angles = calculateDispositionAngles();
             Point center = calculateItemPositions(angles.first, angles.second);
@@ -361,7 +473,28 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
      * Returns a boolean array (left, top, right, bottom) that indicates whether the opened menu view touches its sides
      */
     private boolean[] isGlobalViewOutsideBoundaries() {
+        return isGlobalViewOutsideBoundaries(0);
+    }
+
+    /**
+     * Returns a boolean array (left, top, right, bottom) that indicates whether the opened menu view touches its sides
+     *
+     * @param padding An extra space added to the calculus of the radius
+     */
+    private boolean[] isGlobalViewOutsideBoundaries(int padding) {
         boolean[] results = new boolean[4];
+        float realRadius = getRealRadius(padding);
+
+        // get the center
+        Point center = getActionViewCenter();
+        results[0] = center.x - realRadius <= 0; // left
+        results[2] = center.x + realRadius >= screenWidth; // right
+        results[1] = center.y - realRadius <= 0; // top
+        results[3] = center.y + realRadius >= screenHeight; // bottom
+        return results;
+    }
+
+    private float getRealRadius(int padding) {
         // 1 - get the largest width/height of the children
         int largestWidth = 0, largestHeight = 0;
         for (SubButton button : subMenuButtons) {
@@ -373,14 +506,7 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
             }
         }
         // 2 - add radius to the width to calculate the wides
-        float realRadius = radius + (largestWidth >= largestHeight ? largestWidth : largestHeight) / 2;
-        // 3 - get the center
-        Point center = getActionViewCenter();
-        results[0] = center.x - realRadius <= 0; // left
-        results[2] = center.x + realRadius >= screenWidth; // right
-        results[1] = center.y - realRadius <= 0; // top
-        results[3] = center.y + realRadius >= screenHeight; // bottom
-        return results;
+        return radius + padding + (largestWidth >= largestHeight ? largestWidth : largestHeight) / 2;
     }
 
     private Pair<Integer, Integer> calculateDispositionAngles() {
@@ -476,13 +602,30 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
         return this;
     }
 
+    /**
+     * @deprecated Use movementStyle instead
+     */
+    @Deprecated
     public FloatingMenuButton setAnchored(boolean isAnchored) {
-        this.isAnchored = isAnchored;
+        movementStyle = isAnchored ? MovementStyle.ANCHORED : MovementStyle.FREE;
         return this;
     }
 
+    /**
+     * @deprecated Use movementStyle instead
+     */
+    @Deprecated
     public boolean isAnchored() {
-        return this.isAnchored;
+        return movementStyle == MovementStyle.ANCHORED;
+    }
+
+    public FloatingMenuButton setMovementStyle(MovementStyle movementStyle) {
+        this.movementStyle = movementStyle;
+        return this;
+    }
+
+    public MovementStyle getMovementStyle() {
+        return movementStyle;
     }
 
     public AnimationType getAnimationType() {
@@ -504,4 +647,18 @@ public class FloatingMenuButton extends FrameLayout implements View.OnTouchListe
         return subMenuButtons;
     }
 
+    /**
+     * Indicates after how many milliseconds the button should get transparent
+     * after it was moved or clicked.
+     *
+     * @param transparentAfterMilliseconds the time in milliseconds, 0 to always be transparent or < 0 to never be transparent.
+     */
+    public FloatingMenuButton setTransparentAfterMilliseconds(int transparentAfterMilliseconds) {
+        this.transparentAfterMilliseconds = transparentAfterMilliseconds;
+        return this;
+    }
+
+    public int getTransparentAfterMilliseconds() {
+        return transparentAfterMilliseconds;
+    }
 }
